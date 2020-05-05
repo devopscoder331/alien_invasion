@@ -25,7 +25,7 @@ def run_game():
     aliens = Group()
 
     # create fleet of aliens
-    gf.create_fleet(ai_settings, screen, aliens)
+    gf.create_fleet(ai_settings, screen, ship, aliens)
     # run main cycle game
     while True:
         gf.check_events(ai_settings, screen, ship, bullets)
