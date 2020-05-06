@@ -67,6 +67,10 @@ def update_bullets(bullets):
         if bullet.rect.bottom < 0:
             bullets.remove(bullet)
 
+def update_aliens(aliens):
+    '''update position all alins in fleet'''
+    aliens.update()
+
 def get_number_aliens_x(ai_settings, alien_width):
     # find number aliens in a row
     available_space_x = ai_settings.screen_width - 2 * alien_width
