@@ -28,3 +28,11 @@ class Alien(Sprite):
         '''alien move right'''
         self.x += self.ai_settings.alien_speed_factor
         self.rect.x = self.x
+
+    def check_edges(self):
+        '''Return True if aleins in edges'''
+        screen_rect = self.screen.get_rect()
+        if self.rect.right >= scren.rect.right:
+            return True
+        elif self.rect.right <= 0:
+            return True
