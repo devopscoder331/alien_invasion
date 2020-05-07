@@ -57,11 +57,17 @@ def fire_bullets(ai_settings, screen, ship, bullets):
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
 
-def update_bullets(bullets, aliens):
+def update_bullets(ai_settings, screen, ship, bullets, aliens):
     '''update bullets pisition and delete old bullets'''
     # update position bulleets
     bullets.update()
     collision = pygame.sprite.groupcollide(bullets, aliens, True, True)
+
+    if len(aliens) == 0:
+        #delete bullets and create new fleet
+        bullets.empty()
+        create_fleet(ai_settings, screen, ship, aliens)
+
 
     # delete old bullets that have disappeared
     for bullet in bullets.copy():
