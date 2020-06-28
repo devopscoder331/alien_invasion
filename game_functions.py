@@ -96,6 +96,9 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
     if play_button.rect.collidepoint(mouse_x, mouse_y):
         button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
         if button_clicked and not stats.game_active:
+            # hide mouse
+            pygame.mouse.set_visible(False)
+
             # reset game stats
             stats.reset_stats()
             stats.game_active = True
@@ -112,19 +115,9 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
     '''Respond to ship being hit by alien'''
     if stats.ships_left > 0:
         stats.ships_left -= 1
-
-        # delete all items aliens and bullets
-        aliens.empty()
-        bullets.empty()
-
-        # create new fleet and start position ship
-        create_fleet(ai_settings, screen, ship, aliens)
-        ship.center_ship()
-
-        # pause
-        sleep(0.5)
     else:
         stats.game_active = False
+        pygame.mouse.set_invisible(True)
 
 def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     '''update position all alins in fleet'''
