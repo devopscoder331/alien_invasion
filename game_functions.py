@@ -44,40 +44,14 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
-def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
-    '''update display and flip to the new screen'''
-    screen.fill(ai_settings.bg_collor)
-    # bullet
-    for bullet in bullets.sprites():
-        bullet.draw_bullet()
-    # draw a ship after screen.fill
-    ship.blitme()
-    # alien.blitme()
-    aliens.draw(screen)
-    # button show if game not active
-    if not stats.game_active:
-        play_button.draw_button()
-    # show last display
-    pygame.display.flip()
-
-def fire_bullets(ai_settings, screen, ship, bullets):
-    if len(bullets) < ai_settings.bullets_allowed:
-        new_bullet = Bullet(ai_settings, screen, ship)
-        bullets.add(new_bullet)
-
-def update_bullets(ai_settings, screen, ship, aliens, bullets):
-    '''update bullets pisition and delete old bullets'''
-    # update position bulleets
-    bullets.update()
-
-    # delete old bullets that have disappeared
-    for bullet in bullets.copy():
-        if bullet.rect.bottom < 0:
-            bullets.remove(bullet)
-    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
-
-def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
+def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
     collision = pygame.sprite.groupcollide(bullets, aliens, True, True)
+    if collision:
+        for aliens in collision.values():
+            stats.score += ai_settings.alien_points * len(aliens)
+            sb.prep_score()
+        #stats.score += ai_settings.alien_points
+        #sb.prep_score()
 
     if len(aliens) == 0:
         #delete bullets and create new fleet
@@ -115,6 +89,17 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
             create_fleet(ai_settings, screen, ship, aliens)
             ship.center_ship()
 
+def check_fleet_edges(ai_settings, aliens):
+    for alien in aliens.sprites():
+        if alien.check_edges():
+            change_fleet_direction(ai_settings, aliens)
+            break
+
+def fire_bullets(ai_settings, screen, ship, bullets):
+    if len(bullets) < ai_settings.bullets_allowed:
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
+
 def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
     '''Respond to ship being hit by alien'''
     if stats.ships_left > 0:
@@ -134,6 +119,35 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
 
     # check aliens hit bottom
     check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
+
+def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
+    '''update bullets pisition and delete old bullets'''
+    # update position bulleets
+    bullets.update()
+
+    # delete old bullets that have disappeared
+    for bullet in bullets.copy():
+        if bullet.rect.bottom < 0:
+            bullets.remove(bullet)
+    check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets)
+
+def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
+    '''update display and flip to the new screen'''
+    screen.fill(ai_settings.bg_color)
+    # bullet
+    for bullet in bullets.sprites():
+        bullet.draw_bullet()
+    # draw a ship after screen.fill
+    ship.blitme()
+    # alien.blitme()
+    aliens.draw(screen)
+    # display Scoreboard
+    sb.show_score()
+    # button show if game not active
+    if not stats.game_active:
+        play_button.draw_button()
+    # show last display
+    pygame.display.flip()
 
 def get_number_aliens_x(ai_settings, alien_width):
     # find number aliens in a row
@@ -164,12 +178,6 @@ def create_fleet(ai_settings, screen, ship, aliens):
     for row_number in range(number_rows):
         for alien_number in range(number_aliens_x):
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
-
-def check_fleet_edges(ai_settings, aliens):
-    for alien in aliens.sprites():
-        if alien.check_edges():
-            change_fleet_direction(ai_settings, aliens)
-            break
 
 def change_fleet_direction(ai_settings, aliens):
     for alien in aliens.sprites():
